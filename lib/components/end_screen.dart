@@ -3,8 +3,8 @@ import 'package:flame/experimental.dart' hide RoundedRectangle;
 import 'package:flame/text.dart' as flame;
 import 'package:flutter/widgets.dart';
 import 'package:hack_improved/components/rounded_rectangle.dart';
-import 'package:hack_improved/components/server_zoomin.dart';
 import 'package:hack_improved/constants.dart';
+import 'package:hack_improved/models/server_type.dart';
 
 class EndScreen extends PositionComponent {
   EndScreen()

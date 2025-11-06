@@ -1,10 +1,15 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
+import 'package:flame_bloc/flame_bloc.dart';
+import 'package:hack_improved/blocs/level_two_bloc.dart';
 import 'package:hack_improved/level_two.dart';
 
 class HackGame extends FlameGame {
   late CameraComponent cam;
   late LevelTwo levelTwo;
+  LevelTwoBloc levelTwoBloc;
+
+  HackGame({required this.levelTwoBloc});
 
   @override
   Future<void> onLoad() async {
@@ -25,6 +30,11 @@ class HackGame extends FlameGame {
 
     cam.viewfinder.anchor = Anchor.topLeft;
 
-    await addAll([cam, levelTwo]);
+    await add(
+      FlameBlocProvider<LevelTwoBloc, LevelTwoState>(
+        create: () => levelTwoBloc,
+        children: [cam, levelTwo],
+      ),
+    );
   }
 }

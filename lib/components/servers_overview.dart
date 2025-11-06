@@ -2,11 +2,14 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/experimental.dart' hide RoundedRectangle;
 import 'package:flame/text.dart' as flame;
+import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:hack_improved/blocs/level_two_bloc.dart';
 import 'package:hack_improved/components/rounded_rectangle.dart';
 import 'package:hack_improved/components/utils.dart';
 import 'package:hack_improved/constants.dart';
 import 'package:hack_improved/hack_game.dart';
+import 'package:hack_improved/models/server_type.dart';
 
 class ServerOverview extends PositionComponent {
   ServerOverview() : super(size: Vector2(1500, 850));
@@ -29,6 +32,7 @@ class ServerOverview extends PositionComponent {
       children: [headerWSpacer, serverSection, check],
     );
     add(column);
+    return super.onLoad();
   }
 }
 
@@ -122,6 +126,7 @@ class CheckButton extends PositionComponent
       ],
     );
     add(rectangle);
+    return super.onLoad();
   }
 
   @override
@@ -131,7 +136,10 @@ class CheckButton extends PositionComponent
 }
 
 class ServerBox extends PositionComponent
-    with HasGameReference<HackGame>, TapCallbacks {
+    with
+        HasGameReference<HackGame>,
+        TapCallbacks,
+        FlameBlocListenable<LevelTwoBloc, LevelTwoState> {
   SpriteComponent sprite;
   final int serverNumber;
 
@@ -143,7 +151,35 @@ class ServerBox extends PositionComponent
   });
 
   @override
+  void update(double dt) {
+    switch ((bloc.state as Initial).servers[serverNumber]) {
+      case ServerType.unknown:
+        remove(sprite);
+        sprite = SpriteComponent.fromImage(
+          game.images.fromCache("blue_server.png"),
+          paint: Paint()
+            ..colorFilter = ColorFilter.mode(Colors.grey, BlendMode.saturation),
+        );
+        add(sprite);
+      case ServerType.safe:
+        remove(sprite);
+        sprite = SpriteComponent.fromImage(
+          game.images.fromCache("green_server.png"),
+        );
+        add(sprite);
+      case ServerType.infected:
+        remove(sprite);
+        sprite = SpriteComponent.fromImage(
+          game.images.fromCache("red_server.png"),
+        );
+        add(sprite);
+    }
+    super.update(dt);
+  }
+
+  @override
   Future<void> onLoad() async {
+    print(serverNumber);
     add(sprite);
   }
 
@@ -153,7 +189,13 @@ class ServerBox extends PositionComponent
   }
 }
 
-class ServerSection extends PositionComponent with HasGameReference {
+class ServerSection extends PositionComponent
+    with
+        HasGameReference<HackGame>,
+        FlameBlocListenable<LevelTwoBloc, LevelTwoState> {
+  late SpriteComponent sprite;
+  late int serverNumber;
+
   ServerSection({required super.size});
 
   @override
@@ -168,7 +210,8 @@ class ServerSection extends PositionComponent with HasGameReference {
     double x = spaceX, y = spaceY;
 
     for (int i = 0; i < 8; i++) {
-      final sprite = SpriteComponent.fromImage(
+      serverNumber = i;
+      sprite = SpriteComponent.fromImage(
         game.images.fromCache("blue_server.png"),
         paint: Paint()
           ..colorFilter = ColorFilter.mode(Colors.grey, BlendMode.saturation),
@@ -178,6 +221,7 @@ class ServerSection extends PositionComponent with HasGameReference {
         boxSize: iconSize,
         imageSize: sprite.size,
       );
+
       add(
         ServerBox(
           serverNumber: i,
@@ -193,5 +237,6 @@ class ServerSection extends PositionComponent with HasGameReference {
         y += spaceY + iconSize.y;
       }
     }
+    return super.onLoad();
   }
 }

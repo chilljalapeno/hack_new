@@ -8,6 +8,7 @@ import 'package:hack_improved/components/ui.dart';
 
 class LevelTwo extends World {
   late final RouterComponent router;
+
   @override
   Future<void> onLoad() async {
     UI ui = UI();
@@ -21,7 +22,7 @@ class LevelTwo extends World {
         'server0': Route(
           () => MainContainer(
             child: ServerZoomIn(
-              serverNumber: 1,
+              serverNumber: 0,
               networkStatus: NetworkStatus.normal,
               firewallStatus: FirewallStatus.secure,
             ),
@@ -30,7 +31,7 @@ class LevelTwo extends World {
         'server1': Route(
           () => MainContainer(
             child: ServerZoomIn(
-              serverNumber: 2,
+              serverNumber: 1,
               networkStatus: NetworkStatus.normal,
               firewallStatus: FirewallStatus.secure,
             ),
@@ -39,7 +40,7 @@ class LevelTwo extends World {
         'server2': Route(
           () => MainContainer(
             child: ServerZoomIn(
-              serverNumber: 3,
+              serverNumber: 2,
               networkStatus: NetworkStatus.normal,
               firewallStatus: FirewallStatus.secure,
             ),
@@ -48,7 +49,7 @@ class LevelTwo extends World {
         'server3': Route(
           () => MainContainer(
             child: ServerZoomIn(
-              serverNumber: 4,
+              serverNumber: 3,
               networkStatus: NetworkStatus.normal,
               firewallStatus: FirewallStatus.secure,
             ),
@@ -57,7 +58,7 @@ class LevelTwo extends World {
         'server4': Route(
           () => MainContainer(
             child: ServerZoomIn(
-              serverNumber: 5,
+              serverNumber: 4,
               networkStatus: NetworkStatus.normal,
               firewallStatus: FirewallStatus.secure,
             ),
@@ -66,7 +67,7 @@ class LevelTwo extends World {
         'server5': Route(
           () => MainContainer(
             child: ServerZoomIn(
-              serverNumber: 6,
+              serverNumber: 5,
               networkStatus: NetworkStatus.normal,
               firewallStatus: FirewallStatus.secure,
             ),
@@ -75,7 +76,7 @@ class LevelTwo extends World {
         'server6': Route(
           () => MainContainer(
             child: ServerZoomIn(
-              serverNumber: 7,
+              serverNumber: 6,
               networkStatus: NetworkStatus.normal,
               firewallStatus: FirewallStatus.secure,
             ),
@@ -84,7 +85,7 @@ class LevelTwo extends World {
         'server7': Route(
           () => MainContainer(
             child: ServerZoomIn(
-              serverNumber: 8,
+              serverNumber: 7,
               networkStatus: NetworkStatus.normal,
               firewallStatus: FirewallStatus.secure,
             ),

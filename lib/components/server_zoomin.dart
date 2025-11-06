@@ -2,18 +2,21 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/experimental.dart' hide RoundedRectangle;
 import 'package:flame/text.dart' as flame;
+import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/rendering.dart';
+import 'package:hack_improved/blocs/level_two_bloc.dart';
 import 'package:hack_improved/components/moving_lines.dart';
 import 'package:hack_improved/components/rounded_rectangle.dart';
 import 'package:hack_improved/components/utils.dart';
 import 'package:hack_improved/constants.dart';
 import 'package:hack_improved/hack_game.dart';
+import 'package:hack_improved/models/server_type.dart';
 
 enum NetworkStatus { unknown, normal, overload }
 
-enum ServerType { safe, infected, unknown }
-
 enum FirewallStatus { secure, unknown, open }
+
+enum ButtonType { safe, infected }
 
 class ServerZoomIn extends PositionComponent {
   final int serverNumber;
@@ -45,7 +48,7 @@ class ServerZoomIn extends PositionComponent {
     assert(serversType.length == 8, "The number of server types should be 8");
     ServerZoomInHeader header = ServerZoomInHeader(
       serverNumber: serverNumber,
-      serverType: serversType[serverNumber - 1],
+      serverType: serversType[serverNumber],
     );
 
     ServerZoomInCpuNetworkFirewall rightSide = ServerZoomInCpuNetworkFirewall(
@@ -63,6 +66,8 @@ class ServerZoomIn extends PositionComponent {
       outlineColor: ThemeColors.safeButtonOutline,
       bgColor: ThemeColors.safeButtonBg,
       text: "Safe",
+      type: ButtonType.safe,
+      serverNumber: serverNumber,
       image: "check.png",
     );
     ServerZoomInButton button3 = ServerZoomInButton(
@@ -70,6 +75,8 @@ class ServerZoomIn extends PositionComponent {
       outlineColor: ThemeColors.infectedButtonOutline,
       bgColor: ThemeColors.infectedButtonBg,
       text: "Infected",
+      type: ButtonType.infected,
+      serverNumber: serverNumber,
       image: "alert_icon.png",
     );
 
@@ -128,9 +135,9 @@ class ServerZoomInHeader extends PositionComponent {
     };
 
     String content = switch (serverType) {
-      ServerType.safe => "Server $serverNumber - Identified safe",
-      ServerType.infected => "Server $serverNumber - Identified infected",
-      ServerType.unknown => "Server $serverNumber - Identified unknown",
+      ServerType.safe => "Server ${serverNumber + 1} - Identified safe",
+      ServerType.infected => "Server ${serverNumber + 1} - Identified infected",
+      ServerType.unknown => "Server ${serverNumber + 1} - Identified unknown",
     };
 
     TextComponent text = TextComponent(
@@ -164,12 +171,17 @@ class ServerZoomInHeader extends PositionComponent {
 }
 
 class ServerZoomInButton extends PositionComponent
-    with HasGameReference<HackGame>, TapCallbacks {
+    with
+        HasGameReference<HackGame>,
+        TapCallbacks,
+        FlameBlocReader<LevelTwoBloc, LevelTwoState> {
   final Color bgColor;
   final Color textColor;
   final Color outlineColor;
   final String text;
   final String image;
+  final int serverNumber;
+  final ButtonType type;
 
   ServerZoomInButton({
     required this.bgColor,
@@ -177,6 +189,8 @@ class ServerZoomInButton extends PositionComponent
     required this.outlineColor,
     required this.text,
     required this.image,
+    required this.serverNumber,
+    required this.type,
   }) : super(size: Vector2(400, 125));
 
   @override
@@ -213,11 +227,20 @@ class ServerZoomInButton extends PositionComponent
       children: [inner],
     );
     add(outer);
+    return super.onLoad();
   }
 
   @override
   void onTapDown(TapDownEvent event) {
     game.levelTwo.router.pop();
+    switch (type) {
+      case ButtonType.safe:
+        bloc.add(LevelTwoEvent.safe(serverNumber: serverNumber));
+        break;
+      case ButtonType.infected:
+        bloc.add(LevelTwoEvent.infected(serverNumber: serverNumber));
+        break;
+    }
   }
 }
 
@@ -353,49 +376,49 @@ class ServerZoomInLog extends PositionComponent with HasGameReference {
   ServerZoomInLog({required this.tSize, required this.serverNumber})
     : super(size: tSize);
 
-  final server1Text = <String>[
+  final server0Text = <String>[
     "Unknown program started: temp_sync.tmp",
     "Short connection made to an external address",
     "Staff login failed three times in a row",
     "Firewall setting changed without approval",
   ];
-  final server2Text = <String>[
+  final server1Text = <String>[
     "Installed file found: export_tool.exe",
     "Network unusually active around 03:00",
     "User account opened from another department",
     "Large data transfer sent outside the hospital",
   ];
-  final server3Text = <String>[
+  final server2Text = <String>[
     "Backup finished successfully",
     "Login attempt from night shift — password correct",
     "Brief network spike at 02:55 (auto-resolved)",
     "CPU load stable",
   ];
-  final server4Text = <String>[
+  final server3Text = <String>[
     "Failed login from unknown location",
     "New file created: svc_update.dat",
     "System reached out to an unlisted IP address",
     "Virus scanner briefly showed a warning, then cleared",
   ];
-  final server5Text = <String>[
+  final server4Text = <String>[
     "Printer in Ward C reported repeated errors",
     "Restart completed after small delay",
     "Backup completed, minor warning: “checksum mismatch”",
     "No unusual network connections detected",
   ];
-  final server6Text = <String>[
+  final server5Text = <String>[
     "Nurse logged in with correct credentials",
     "Scheduled update installed overnight",
     "CPU usage normal (18%)",
     "Short connection drop automatically fixed",
   ];
-  final server7Text = <String>[
+  final server6Text = <String>[
     "Unknown file active: network_probe.exe",
     "Login from unrecognized tablet at 02:34",
     "Sending large data packets outside network",
     "Security log entries partially deleted",
   ];
-  final server8Text = <String>[
+  final server7Text = <String>[
     "Failed login from unknown location",
     "New file created: svc_update.dat",
     "System reached out to an unlisted IP address",
@@ -407,6 +430,7 @@ class ServerZoomInLog extends PositionComponent with HasGameReference {
   @override
   Future<void> onLoad() async {
     final Map<int, List<String>> serversText = {
+      0: server0Text,
       1: server1Text,
       2: server2Text,
       3: server3Text,
@@ -414,7 +438,6 @@ class ServerZoomInLog extends PositionComponent with HasGameReference {
       5: server5Text,
       6: server6Text,
       7: server7Text,
-      8: server8Text,
     };
 
     PositionComponent spacer = PositionComponent(size: Vector2(16, 50));
