@@ -10,7 +10,7 @@ class EndScreen extends PositionComponent {
   EndScreen()
     : super(
         size: Vector2(1500, 850) - Vector2(96, 96),
-        position: Vector2(210, 148) + Vector2(48, 48),
+        position: Vector2(48, 48),
       );
 
   @override

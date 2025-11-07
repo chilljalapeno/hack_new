@@ -7,9 +7,8 @@ import 'package:hack_improved/level_two.dart';
 class HackGame extends FlameGame {
   late CameraComponent cam;
   late LevelTwo levelTwo;
-  LevelTwoBloc levelTwoBloc;
 
-  HackGame({required this.levelTwoBloc});
+  HackGame();
 
   @override
   Future<void> onLoad() async {
@@ -32,7 +31,7 @@ class HackGame extends FlameGame {
 
     await add(
       FlameBlocProvider<LevelTwoBloc, LevelTwoState>(
-        create: () => levelTwoBloc,
+        create: () => LevelTwoBloc(),
         children: [cam, levelTwo],
       ),
     );

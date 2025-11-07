@@ -1,17 +1,28 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
+import 'package:flame_bloc/flame_bloc.dart';
+import 'package:hack_improved/blocs/level_two_bloc.dart';
 import 'package:hack_improved/components/end_screen.dart';
 import 'package:hack_improved/components/main_container.dart';
 import 'package:hack_improved/components/server_zoomin.dart';
 import 'package:hack_improved/components/servers_overview.dart';
 import 'package:hack_improved/components/ui.dart';
 
-class LevelTwo extends World {
+class LevelTwo extends World
+    with FlameBlocListenable<LevelTwoBloc, LevelTwoState> {
   late final RouterComponent router;
+  late UI ui;
+
+  @override
+  void onNewState(LevelTwoState state) {
+    if (state is Win) {
+      router.pushNamed('end');
+    }
+  }
 
   @override
   Future<void> onLoad() async {
-    UI ui = UI();
+    ui = UI();
     add(ui);
 
     router = RouterComponent(
@@ -94,22 +105,6 @@ class LevelTwo extends World {
       },
     );
     add(router);
-    // ServerOverview serverOverview = ServerOverview();
-    // MainContainer mainContainer = MainContainer(child: serverOverview);
-
-    // EndScreen endScreen = EndScreen();
-
-    // ServerZoomIn serverZoomIn = ServerZoomIn(
-    //   serverNumber: 2,
-    //   networkStatus: NetworkStatus.normal,
-    //   firewallStatus: FirewallStatus.open,
-    // );
-
-    // add(ui);
-    // add(mainContainer);
-    // add(endScreen);
-    // add(serverZoomIn);
-
     super.onLoad();
   }
 }

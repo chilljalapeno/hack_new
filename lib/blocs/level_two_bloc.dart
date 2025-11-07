@@ -15,7 +15,7 @@ class LevelTwoBloc extends Bloc<LevelTwoEvent, LevelTwoState> {
 
       int correctServers = 0;
       for (int i = 0; i < (state as Initial).servers.length; i += 1) {
-        if ((state as Initial).servers[i] == (state as Initial).winServers[i]) {
+        if (data[i] == (state as Initial).winServers[i]) {
           correctServers += 1;
         }
       }
@@ -29,13 +29,12 @@ class LevelTwoBloc extends Bloc<LevelTwoEvent, LevelTwoState> {
 
     on<Safe>((event, emit) {
       assert(state is Initial);
-      assert(state is Initial);
       List<ServerType> data = List.from((state as Initial).servers);
       data[event.serverNumber] = ServerType.safe;
 
       int correctServers = 0;
       for (int i = 0; i < (state as Initial).servers.length; i += 1) {
-        if ((state as Initial).servers[i] == (state as Initial).winServers[i]) {
+        if (data[i] == (state as Initial).winServers[i]) {
           correctServers += 1;
         }
       }

@@ -152,27 +152,32 @@ class ServerBox extends PositionComponent
 
   @override
   void update(double dt) {
-    switch ((bloc.state as Initial).servers[serverNumber]) {
-      case ServerType.unknown:
-        remove(sprite);
-        sprite = SpriteComponent.fromImage(
-          game.images.fromCache("blue_server.png"),
-          paint: Paint()
-            ..colorFilter = ColorFilter.mode(Colors.grey, BlendMode.saturation),
-        );
-        add(sprite);
-      case ServerType.safe:
-        remove(sprite);
-        sprite = SpriteComponent.fromImage(
-          game.images.fromCache("green_server.png"),
-        );
-        add(sprite);
-      case ServerType.infected:
-        remove(sprite);
-        sprite = SpriteComponent.fromImage(
-          game.images.fromCache("red_server.png"),
-        );
-        add(sprite);
+    if (bloc.state is Initial) {
+      switch ((bloc.state as Initial).servers[serverNumber]) {
+        case ServerType.unknown:
+          remove(sprite);
+          sprite = SpriteComponent.fromImage(
+            game.images.fromCache("blue_server.png"),
+            paint: Paint()
+              ..colorFilter = ColorFilter.mode(
+                Colors.grey,
+                BlendMode.saturation,
+              ),
+          );
+          add(sprite);
+        case ServerType.safe:
+          remove(sprite);
+          sprite = SpriteComponent.fromImage(
+            game.images.fromCache("green_server.png"),
+          );
+          add(sprite);
+        case ServerType.infected:
+          remove(sprite);
+          sprite = SpriteComponent.fromImage(
+            game.images.fromCache("red_server.png"),
+          );
+          add(sprite);
+      }
     }
     super.update(dt);
   }
