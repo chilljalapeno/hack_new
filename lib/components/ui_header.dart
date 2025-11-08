@@ -39,7 +39,7 @@ class UiHeader extends PositionComponent {
 class HeaderText extends TextComponent {
   HeaderText()
     : super(
-        text: "Server Network",
+        // text: "Server Network",
         textRenderer: TextPaint(
           style: flame.TextStyle(fontSize: 40, color: ThemeColors.uiHeader),
         ),

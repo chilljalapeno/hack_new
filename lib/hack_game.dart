@@ -1,39 +1,70 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+
+import 'package:flutter/material.dart';
 import 'package:hack_improved/blocs/level_two_bloc.dart';
 import 'package:hack_improved/level_two.dart';
+import 'package:hack_improved/screens/loading_screen.dart';
+import 'package:hack_improved/screens/phase_zero.dart';
+import 'package:hack_improved/screens/phase_one.dart';
+import 'package:hack_improved/screens/power_dashboard.dart';
+import 'package:hack_improved/screens/splash_screen.dart';
 
 class HackGame extends FlameGame {
   late CameraComponent cam;
+  late SplashScreen splashScreen;
+  late LoadingScreen loadingScreen;
+  late PhaseZero phaseZero;
+  late PhaseOne phaseOne;
+  late PowerDashboard powerDashboard;
   late LevelTwo levelTwo;
 
-  HackGame();
+  // Store the company name entered by the player
+  String companyName = 'Company Name';
 
   @override
   Future<void> onLoad() async {
     await images.loadAllImages();
-    await _loadLevels();
+    _loadLevels();
     return super.onLoad();
+  }
+
+  @override
+  Color backgroundColor() {
+    return const Color.fromARGB(255, 0, 0, 0);
   }
 
   Future<void> _loadLevels() async {
     add(FpsTextComponent());
+    splashScreen = SplashScreen();
+    phaseZero = PhaseZero();
+    phaseOne = PhaseOne();
+    powerDashboard = PowerDashboard();
     levelTwo = LevelTwo();
+    loadingScreen = LoadingScreen();
+
+    final levelTwoProvider = FlameBlocProvider<LevelTwoBloc, LevelTwoState>(
+      create: LevelTwoBloc.new,
+      children: [levelTwo],
+    );
 
     cam = CameraComponent.withFixedResolution(
-      world: levelTwo,
-      width: 1920,
-      height: 1080,
+      world: splashScreen,
+      width: size.x,
+      height: size.y,
     );
 
     cam.viewfinder.anchor = Anchor.topLeft;
 
-    await add(
-      FlameBlocProvider<LevelTwoBloc, LevelTwoState>(
-        create: () => LevelTwoBloc(),
-        children: [cam, levelTwo],
-      ),
-    );
+    addAll([
+      cam,
+      splashScreen,
+      loadingScreen,
+      phaseZero,
+      phaseOne,
+      powerDashboard,
+      levelTwoProvider,
+    ]);
   }
 }

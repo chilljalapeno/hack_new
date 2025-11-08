@@ -1,6 +1,6 @@
 name: hack_improved
 description: "Hack game improved"
-publish_to: 'none' 
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
@@ -24,7 +24,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  
+
   assets:
     - assets/images/splash_background.png
     - assets/images/connection.png
@@ -39,6 +39,44 @@ flutter:
     - assets/images/node.png
     - assets/images/human.png
     - assets/images/arrows.png
+    - assets/images/phase0_icons/chat.png
+    - assets/images/phase0_icons/contacts.png
+    - assets/images/phase0_icons/epd.png
+    - assets/images/phase0_icons/docs.png
+    - assets/images/phase0_icons/power.png
+    - assets/images/phase0_icons/network.png
+    - assets/images/phase0_icons/pager.png
+    - assets/images/phase0_icons/mail.png
+    - assets/images/phase0_icons/chat_blackout.png
+    - assets/images/phase0_icons/contacts_blackout.png
+    - assets/images/phase0_icons/epd_blackout.png
+    - assets/images/phase0_icons/docs_blackout.png
+    - assets/images/phase0_icons/power_blackout.png
+    - assets/images/phase0_icons/network_blackout.png
+    - assets/images/phase0_icons/pager_blackout.png
+    - assets/images/phase0_icons/mail_blackout.png
+    - assets/images/Infected.png
+    - assets/images/Connection.png
+    - assets/images/Safe.png
+    - assets/images/phase0_icons/png_location.png
+    - assets/images/phase0_icons/png_calendar.png
+    # - assets/images/Observation.png
+    # - assets/images/Background before hack.png
+    # - assets/images/Background after hack.png
+    - assets/images/escape_the hack_logo.png
+    - assets/images/splash_background.png
+    - assets/images/phase0_icons/weather.png
+    - assets/images/phase0_icons/calendar.png
+    - assets/images/background_basescreen.png
+    - assets/images/phase0_icons/wifi_white.png
+    - assets/images/phase0_icons/battery_white.png
+    - assets/images/phase0_icons/connection_white.png
+    - assets/images/phase0_icons/wifi_black.png
+    - assets/images/phase0_icons/battery_black.png
+    - assets/images/phase0_icons/connection_black.png
+    - assets/images/phase0_icons/hacker_background.png
+    - assets/images/phase0_icons/afterhack_weather.png
+    - assets/images/phase0_icons/afterhack_calendar.png
     # - assets/images/mail.png
     # - assets/images/Infected.png
     # - assets/images/Connection.png
