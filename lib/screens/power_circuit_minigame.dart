@@ -1,10 +1,12 @@
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/experimental.dart' hide RoundedRectangle;
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import 'package:hack_improved/hack_game.dart';
 import 'package:hack_improved/components/ui_header.dart';
 import 'package:hack_improved/components/rounded_rectangle.dart';
+import 'package:hack_improved/constants.dart';
 
 enum WireColor { green, blue, red }
 
@@ -27,13 +29,20 @@ class PowerCircuitMinigame extends World with HasGameReference<HackGame> {
 
   @override
   Future<void> onLoad() async {
-    final screenWidth = game.size.x;
-    final screenHeight = game.size.y;
+    final screenWidth = GameDimensions.gameWidth;
+    final screenHeight = GameDimensions.gameHeight;
     // Inner container bounds (match _addContainer insets)
-    final double _containerLeft = 63; // 60 + 3
-    final double _containerTop = 113; // 110 + 3
-    final double _containerRight = screenWidth - 63;
-    final double _containerBottom = screenHeight - 73;
+    final double _containerTop =
+        GameDimensions.circuitContainerMarginTop +
+        GameDimensions.circuitContainerBorderWidth;
+    final double _containerRight =
+        screenWidth -
+        GameDimensions.circuitContainerMarginHorizontal -
+        GameDimensions.circuitContainerBorderWidth;
+    final double _containerBottom =
+        screenHeight -
+        GameDimensions.circuitContainerMarginBottom -
+        GameDimensions.circuitContainerBorderWidth;
 
     // Setup rules for this panel
     _setupPanelRules();
@@ -58,27 +67,48 @@ class PowerCircuitMinigame extends World with HasGameReference<HackGame> {
     // Alert bar
     _addAlertBar(screenWidth);
 
-    // Power nodes
-    _addPowerNodes(screenWidth, screenHeight);
-
     // Wiring manual panel
     // Place the manual panel inside the container with a right margin
-    const double _manualWidth = 380;
-    const double _rightMargin = 40;
+    final double _manualWidth = GameDimensions.circuitManualWidth;
+    final double _rightMargin = GameDimensions.circuitManualRightMargin;
     final double _manualLeft = _containerRight - _rightMargin - _manualWidth;
     manualPanel = _ManualPanel(
       position: Vector2(_manualLeft, _containerTop + 170),
-      size: Vector2(380, 500),
+      size: Vector2(
+        GameDimensions.circuitManualWidth,
+        GameDimensions.circuitManualHeight,
+      ),
       rules: wiringRules,
       level: panelNumber,
     );
     add(manualPanel);
 
-    // Power button
+    // Calculate center position between the two columns for button alignment
+    final double manualLeftEdge =
+        screenWidth -
+        GameDimensions.circuitManualWidth -
+        GameDimensions.circuitManualRightMargin;
+    final double hospitalPowerGap = 60.0;
+    final double availableSpace =
+        manualLeftEdge - GameDimensions.circuitContainerMarginHorizontal;
+    final double centerOfColumns =
+        GameDimensions.circuitContainerMarginHorizontal +
+        (availableSpace - hospitalPowerGap) / 2;
+
+    // Power nodes
+    _addPowerNodes(screenWidth, screenHeight);
+
+    // Power button - centered between columns and positioned above bottom border
     powerButton = _PowerButton(
-      // Inside container, a bit above the bottom
-      position: Vector2(screenWidth / 2, _containerBottom - 40),
-      size: Vector2(400, 80),
+      // Center between Emergency Power and Hospital Power columns
+      position: Vector2(
+        centerOfColumns,
+        _containerBottom - GameDimensions.circuitButtonBottomMargin - 40,
+      ),
+      size: Vector2(
+        GameDimensions.circuitButtonWidth,
+        GameDimensions.circuitButtonHeight,
+      ),
       onTap: _onPowerButtonPressed,
     );
     add(powerButton);
@@ -86,23 +116,39 @@ class PowerCircuitMinigame extends World with HasGameReference<HackGame> {
 
   void _addContainer(double screenWidth, double screenHeight) {
     // Dimensions with margins similar to reference
-    final Vector2 outerSize = Vector2(screenWidth - 120, screenHeight - 180);
-    final Vector2 outerPos = Vector2(60, 110);
+    final Vector2 outerSize = Vector2(
+      GameDimensions.circuitContainerWidth,
+      GameDimensions.circuitContainerHeight,
+    );
+    final Vector2 outerPos = Vector2(
+      GameDimensions.circuitContainerMarginHorizontal,
+      GameDimensions.circuitContainerMarginTop,
+    );
     // Outer acts as border
     add(
       RoundedRectangle(
         size: outerSize,
         position: outerPos,
-        radius: 16,
+        radius: GameDimensions.largeBorderRadius,
         color: const Color(0xFF6DC5D9), // border color
       ),
     );
     // Inner fill slightly inset to reveal border
     add(
       RoundedRectangle(
-        size: outerSize - Vector2(6, 6),
-        position: outerPos + Vector2(3, 3),
-        radius: 16,
+        size:
+            outerSize -
+            Vector2(
+              GameDimensions.circuitContainerBorderWidth * 2,
+              GameDimensions.circuitContainerBorderWidth * 2,
+            ),
+        position:
+            outerPos +
+            Vector2(
+              GameDimensions.circuitContainerBorderWidth,
+              GameDimensions.circuitContainerBorderWidth,
+            ),
+        radius: GameDimensions.largeBorderRadius,
         color: const Color.fromARGB(255, 3, 34, 45), // darker panel fill
       ),
     );
@@ -164,7 +210,7 @@ class PowerCircuitMinigame extends World with HasGameReference<HackGame> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        position: Vector2(screenWidth / 2, 80),
+        position: Vector2(screenWidth / 2, GameDimensions.circuitTitleY),
         anchor: Anchor.center,
       ),
     );
@@ -173,20 +219,32 @@ class PowerCircuitMinigame extends World with HasGameReference<HackGame> {
   void _addAlertBar(double screenWidth) {
     // Red background box
     final alertBox = RectangleComponent(
-      position: Vector2(100, 140),
-      size: Vector2(screenWidth - 200, 70),
+      position: Vector2(
+        GameDimensions.circuitAlertMargin,
+        GameDimensions.circuitAlertY,
+      ),
+      size: Vector2(
+        screenWidth - GameDimensions.circuitAlertMargin * 2,
+        GameDimensions.circuitAlertHeight,
+      ),
       paint: Paint()..color = Color(0xFF671412),
     );
     add(alertBox);
 
     // Outline
     final alertOutline = RectangleComponent(
-      position: Vector2(100, 140),
-      size: Vector2(screenWidth - 200, 70),
+      position: Vector2(
+        GameDimensions.circuitAlertMargin,
+        GameDimensions.circuitAlertY,
+      ),
+      size: Vector2(
+        screenWidth - GameDimensions.circuitAlertMargin * 2,
+        GameDimensions.circuitAlertHeight,
+      ),
       paint: Paint()
         ..color = Color(0xFFCA431A)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 3,
+        ..strokeWidth = GameDimensions.outlineWidth,
     );
     add(alertOutline);
 
@@ -201,20 +259,43 @@ class PowerCircuitMinigame extends World with HasGameReference<HackGame> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        position: Vector2(screenWidth / 2, 175),
+        position: Vector2(
+          screenWidth / 2,
+          GameDimensions.circuitAlertY + GameDimensions.circuitAlertHeight / 2,
+        ),
         anchor: Anchor.center,
       ),
     );
   }
 
   void _addPowerNodes(double screenWidth, double screenHeight) {
-    // Layout tuned to avoid overlap and match the compact reference layout
-    final double contentTop = 300.0;
-    final double nodeDiameter = 100.0;
-    final double spacing = 180.0;
-    final double leftX = 240.0;
-    final double rightX = screenWidth - 680.0; // leave room for manual panel
+    final double contentTop = GameDimensions.circuitNodeStartY;
+    final double nodeDiameter = GameDimensions.circuitNodeDiameter;
+    final double spacing = GameDimensions.circuitNodeSpacing;
+
+    // Calculate center positions for each column
+    // Position columns closer together and more towards the center of the screen
+    final double manualLeftEdge =
+        screenWidth -
+        GameDimensions.circuitManualWidth -
+        GameDimensions.circuitManualRightMargin;
+    final double hospitalPowerGap =
+        60.0; // Gap between Hospital Power and manual
+
+    // Calculate available space between left margin and manual
+    final double availableSpace =
+        manualLeftEdge - GameDimensions.circuitContainerMarginHorizontal;
+    final double columnSpacing = 600.0; // Space between the two columns
+
+    // Center the two columns in the available space
+    final double centerOfColumns =
+        GameDimensions.circuitContainerMarginHorizontal +
+        (availableSpace - hospitalPowerGap) / 2;
+    final double leftColumnCenterX = centerOfColumns - columnSpacing / 2;
+    final double rightColumnCenterX = centerOfColumns + columnSpacing / 2;
+
     final double startY = contentTop;
+    final double headingY = startY - 40;
 
     // Left side - Emergency Power (only active colors)
     add(
@@ -227,15 +308,15 @@ class PowerCircuitMinigame extends World with HasGameReference<HackGame> {
             fontWeight: FontWeight.w500,
           ),
         ),
-        position: Vector2(leftX, startY - 60),
-        anchor: Anchor.centerLeft,
+        position: Vector2(leftColumnCenterX, headingY),
+        anchor: Anchor.center,
       ),
     );
 
     for (int i = 0; i < activeColors.length; i++) {
       final node = _PowerNode(
         color: activeColors[i],
-        position: Vector2(leftX, startY + (i * spacing)),
+        position: Vector2(leftColumnCenterX, startY + 40 + (i * spacing)),
         isLeft: true,
         onDragStartCallback: _onNodeDragStart,
         onDragUpdateCallback: _onNodeDragUpdate,
@@ -257,8 +338,8 @@ class PowerCircuitMinigame extends World with HasGameReference<HackGame> {
             fontWeight: FontWeight.w500,
           ),
         ),
-        position: Vector2(rightX, startY - 60),
-        anchor: Anchor.centerLeft,
+        position: Vector2(rightColumnCenterX, headingY),
+        anchor: Anchor.center,
       ),
     );
 
@@ -266,7 +347,7 @@ class PowerCircuitMinigame extends World with HasGameReference<HackGame> {
     for (int i = 0; i < allColors.length; i++) {
       final node = _PowerNode(
         color: allColors[i],
-        position: Vector2(rightX, startY + (i * spacing)),
+        position: Vector2(rightColumnCenterX, startY + 40 + (i * spacing)),
         isLeft: false,
         nodeDiameter: nodeDiameter,
       );
@@ -430,22 +511,36 @@ class _PowerNode extends PositionComponent with DragCallbacks {
     final double mainRadius = nodeDiameter * 0.30; // main filled circle
     final double labelOffset = nodeDiameter * 0.22;
     // Outer glow circle
-    add(
-      CircleComponent(
-        radius: outerRadius,
-        paint: Paint()..color = _getColor().withOpacity(0.3),
-        anchor: Anchor.center,
-        position: size / 2,
+    final glowCircle = CircleComponent(
+      radius: outerRadius,
+      paint: Paint()..color = _getColor().withValues(alpha: 0.3),
+      anchor: Anchor.center,
+      position: size / 2,
+    );
+    add(glowCircle);
+
+    // Add pulsing effect to glow circle
+    glowCircle.add(
+      ScaleEffect.by(
+        Vector2.all(1.2),
+        EffectController(duration: 1.0, reverseDuration: 1.0, infinite: true),
       ),
     );
 
     // Main circle
-    add(
-      CircleComponent(
-        radius: mainRadius,
-        paint: Paint()..color = _getColor(),
-        anchor: Anchor.center,
-        position: size / 2,
+    final mainCircle = CircleComponent(
+      radius: mainRadius,
+      paint: Paint()..color = _getColor(),
+      anchor: Anchor.center,
+      position: size / 2,
+    );
+    add(mainCircle);
+
+    // Add subtle pulsing effect to main circle
+    mainCircle.add(
+      ScaleEffect.by(
+        Vector2.all(1.1),
+        EffectController(duration: 1.2, reverseDuration: 1.2, infinite: true),
       ),
     );
 
@@ -543,7 +638,7 @@ class _WireConnection extends PositionComponent {
     // Draw glow effect
     if (!isTemporary || isError) {
       final glowPaint = Paint()
-        ..color = (isError ? Colors.red : wireColor).withOpacity(0.5)
+        ..color = (isError ? Colors.red : wireColor).withValues(alpha: 0.5)
         ..strokeWidth = 12
         ..style = PaintingStyle.stroke
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, isLit ? 12 : 6);
@@ -588,7 +683,7 @@ class _ManualPanel extends PositionComponent {
     add(
       RectangleComponent(
         size: size,
-        paint: Paint()..color = Color(0xFF0D4761).withOpacity(0.7),
+        paint: Paint()..color = Color(0xFF0D4761).withValues(alpha: 0.7),
       ),
     );
 
@@ -599,7 +694,7 @@ class _ManualPanel extends PositionComponent {
         paint: Paint()
           ..color = Color(0xFF6DC5D9)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 3,
+          ..strokeWidth = GameDimensions.outlineWidth,
       ),
     );
 
@@ -745,7 +840,7 @@ class _PowerButton extends PositionComponent with TapCallbacks {
         paint: Paint()
           ..color = isActive
               ? Color(0xFF0D4761)
-              : Color(0xFF0D4761).withOpacity(0.3),
+              : Color(0xFF0D4761).withValues(alpha: 0.3),
       ),
     );
 
@@ -756,9 +851,9 @@ class _PowerButton extends PositionComponent with TapCallbacks {
         paint: Paint()
           ..color = isActive
               ? Color(0xFF6DC5D9)
-              : Color(0xFF6DC5D9).withOpacity(0.3)
+              : Color(0xFF6DC5D9).withValues(alpha: 0.3)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 3,
+          ..strokeWidth = GameDimensions.outlineWidth,
       ),
     );
 
@@ -770,7 +865,7 @@ class _PowerButton extends PositionComponent with TapCallbacks {
           style: TextStyle(
             color: isActive
                 ? Color(0xFF6DC5D9)
-                : Color(0xFF6DC5D9).withOpacity(0.3),
+                : Color(0xFF6DC5D9).withValues(alpha: 0.3),
             fontSize: 36,
             fontWeight: FontWeight.bold,
           ),
@@ -814,7 +909,7 @@ class _MatrixColumn extends PositionComponent {
   void render(Canvas canvas) {
     final textPaint = TextPaint(
       style: TextStyle(
-        color: Color(0xFF00FF41).withOpacity(0.1),
+        color: Color(0xFF00FF41).withValues(alpha: 0.1),
         fontSize: 12,
         fontFamily: 'monospace',
       ),

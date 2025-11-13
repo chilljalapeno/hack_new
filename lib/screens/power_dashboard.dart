@@ -19,8 +19,8 @@ class PowerDashboard extends World with HasGameReference<HackGame> {
 
   @override
   Future<void> onLoad() async {
-    final screenWidth = game.size.x;
-    final screenHeight = game.size.y;
+    final screenWidth = GameDimensions.gameWidth;
+    final screenHeight = GameDimensions.gameHeight;
 
     // Background with matrix pattern
     final background = RectangleComponent(
@@ -39,8 +39,8 @@ class PowerDashboard extends World with HasGameReference<HackGame> {
     // Warning banner
     add(
       WarningBanner(
-        position: Vector2((screenWidth - (screenWidth - 200)) / 2, 140),
-        size: Vector2(screenWidth - 200, 90),
+        position: Vector2((screenWidth - (screenWidth - GameDimensions.powerDashboardBannerMargin * 2)) / 2, GameDimensions.powerDashboardBannerY),
+        size: Vector2(screenWidth - GameDimensions.powerDashboardBannerMargin * 2, GameDimensions.powerDashboardBannerHeight),
         message:
             'Emergency generators offline – Restore all 4 circuits to enable backup power.',
         color: ThemeColors.warnRed,
@@ -73,7 +73,7 @@ class PowerDashboard extends World with HasGameReference<HackGame> {
             fontWeight: FontWeight.w500,
           ),
         ),
-        position: Vector2(screenWidth / 2, 70),
+        position: Vector2(screenWidth / 2, GameDimensions.powerDashboardTitleY),
         anchor: Anchor.center,
       ),
     );
@@ -89,7 +89,7 @@ class PowerDashboard extends World with HasGameReference<HackGame> {
         ),
       ),
       // Place below UiHeader (height ~100) and above banner (y=140)
-      position: Vector2(screenWidth - 60, 120),
+      position: Vector2(screenWidth - GameDimensions.powerDashboardTimerRightMargin, GameDimensions.powerDashboardTimerY),
       anchor: Anchor.centerRight,
     );
     add(timerDisplay);
@@ -98,15 +98,15 @@ class PowerDashboard extends World with HasGameReference<HackGame> {
   // Legacy placeholder removed; WarningBanner is added directly in onLoad
 
   void _addPowerPanels(double screenWidth, double screenHeight) {
-    final panelWidth = 750.0;
-    final panelHeight = 300.0;
-    final horizontalGap = 80.0;
-    final verticalGap = 80.0;
+    final panelWidth = GameDimensions.powerDashboardPanelWidth;
+    final panelHeight = GameDimensions.powerDashboardPanelHeight;
+    final horizontalGap = GameDimensions.powerDashboardPanelGapHorizontal;
+    final verticalGap = GameDimensions.powerDashboardPanelGapVertical;
 
     // Calculate starting position to center the grid
     final totalWidth = (panelWidth * 2) + horizontalGap;
     final startX = (screenWidth - totalWidth) / 2;
-    final startY = 270.0;
+    final startY = GameDimensions.powerDashboardPanelStartY;
 
     final panelData = [
       {'name': 'Panel 1', 'number': 1, 'row': 0, 'col': 0},
@@ -139,8 +139,8 @@ class PowerDashboard extends World with HasGameReference<HackGame> {
 
   void _addPowerButton(double screenWidth, double screenHeight) {
     powerButton = _DashboardPowerButton(
-      position: Vector2(screenWidth / 2, screenHeight - 50),
-      size: Vector2(400, 75),
+      position: Vector2(screenWidth / 2, screenHeight - GameDimensions.powerDashboardButtonBottomMargin),
+      size: Vector2(GameDimensions.powerDashboardButtonWidth, GameDimensions.powerDashboardButtonHeight),
       onTap: _onMainPowerButtonPressed,
     );
     add(powerButton);
@@ -350,11 +350,11 @@ class _PanelBorder extends PositionComponent {
     final paint = Paint()
       ..color = borderColor
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3;
+      ..strokeWidth = GameDimensions.outlineWidth;
 
     final rrect = RRect.fromRectAndRadius(
       Offset.zero & size.toSize(),
-      Radius.circular(8),
+      Radius.circular(GameDimensions.borderRadius),
     );
 
     canvas.drawRRect(rrect, paint);

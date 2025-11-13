@@ -6,7 +6,10 @@ import 'package:flame/components.dart';
 import 'package:flame/text.dart' as flame;
 
 class UiHeader extends PositionComponent {
-  UiHeader() : super(position: Vector2(96, 0), size: Vector2(1800, 100));
+  UiHeader() : super(
+    position: Vector2(GameDimensions.headerHorizontalMargin, 0), 
+    size: Vector2(GameDimensions.headerWidth, GameDimensions.headerHeight)
+  );
 
   @override
   // TODO: implement debugMode
@@ -20,7 +23,7 @@ class UiHeader extends PositionComponent {
 
     RowComponent headerWithSpacer = RowComponent(
       children: [
-        PositionComponent(size: Vector2(109, 0)),
+        PositionComponent(size: Vector2(GameDimensions.headerIconsSpacing, 0)),
         headerText,
       ],
     );
@@ -47,7 +50,7 @@ class HeaderText extends TextComponent {
 }
 
 class HeaderIcons extends PositionComponent with HasGameReference {
-  HeaderIcons() : super(size: Vector2(300, 100));
+  HeaderIcons() : super(size: Vector2(GameDimensions.headerIconsWidth, GameDimensions.headerHeight));
 
   @override
   Future<void> onLoad() async {

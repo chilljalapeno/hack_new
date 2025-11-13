@@ -1,5 +1,6 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:hack_improved/constants.dart';
 import 'package:hack_improved/hack_game.dart';
 
 class GameApp extends StatefulWidget {
@@ -30,7 +31,7 @@ class _GameAppState extends State<GameApp> {
               // Calculate the aspect ratio and scale accordingly
               final screenWidth = constraints.maxWidth;
               final screenHeight = constraints.maxHeight;
-              final gameAspectRatio = 1920.0 / 1080.0;
+              final gameAspectRatio = GameDimensions.gameAspectRatio;
               final screenAspectRatio = screenWidth / screenHeight;
 
               double gameWidth, gameHeight;
@@ -48,12 +49,52 @@ class _GameAppState extends State<GameApp> {
                 child: SizedBox(
                   width: gameWidth,
                   height: gameHeight,
-                  child: GameWidget(
-                    game: _game,
-                    overlayBuilderMap: {
-                      'textInput': (context, game) =>
-                          _TextInputOverlay(game: _game),
-                    },
+                  child: Stack(
+                    children: [
+                      GameWidget(
+                        game: _game,
+                        overlayBuilderMap: {
+                          'textInput': (context, game) =>
+                              _TextInputOverlay(game: _game),
+                          'cheatMenu': (context, game) =>
+                              _CheatMenuOverlay(game: _game),
+                        },
+                      ),
+                      // Floating cheat button
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: GestureDetector(
+                          onTap: () {
+                            _game.overlays.add('cheatMenu');
+                          },
+                          child: Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Color(0x990F1F30),
+                              border: Border.all(
+                                color: Color(0xFF6DC5D9),
+                                width: 2,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'CHEAT',
+                                style: TextStyle(
+                                  color: Color(0xFF6DC5D9),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Consolas',
+                                  fontFamilyFallback: ['Courier New', 'monospace'],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -98,11 +139,6 @@ class _TextInputOverlayState extends State<_TextInputOverlay> {
 
   @override
   Widget build(BuildContext context) {
-    // Get the screen dimensions - responsive to actual screen size
-    // Input box dimensions from loading_screen.dart
-    final inputBoxWidth = 600.0;
-    final inputBoxHeight = 80.0;
-
     return GestureDetector(
       onTap: () {
         // Close overlay when tapping outside
@@ -120,7 +156,7 @@ class _TextInputOverlayState extends State<_TextInputOverlay> {
             builder: (context, constraints) {
               final screenWidth = constraints.maxWidth;
               final screenHeight = constraints.maxHeight;
-              final gameAspectRatio = 1920.0 / 1080.0;
+              final gameAspectRatio = GameDimensions.gameAspectRatio;
               final screenAspectRatio = screenWidth / screenHeight;
 
               double gameWidth, gameHeight;
@@ -132,16 +168,24 @@ class _TextInputOverlayState extends State<_TextInputOverlay> {
                 gameHeight = screenWidth / gameAspectRatio;
               }
 
+              // Get the actual input box position and size from the loading screen
+              final inputBoxPos = widget.game.loadingScreen.inputBoxPosition;
+              final inputBoxSize = widget.game.loadingScreen.inputBoxSize;
+
+              // Scale from game world coordinates to actual widget size
+              final scaleX = gameWidth / GameDimensions.gameWidth;
+              final scaleY = gameHeight / GameDimensions.gameHeight;
+
               return SizedBox(
                 width: gameWidth,
                 height: gameHeight,
                 child: Stack(
                   children: [
                     Positioned(
-                      left: (gameWidth - inputBoxWidth) / 2,
-                      top: _calculateInputBoxY(gameHeight),
-                      width: inputBoxWidth,
-                      height: inputBoxHeight,
+                      left: inputBoxPos.x * scaleX,
+                      top: inputBoxPos.y * scaleY,
+                      width: inputBoxSize.x * scaleX,
+                      height: inputBoxSize.y * scaleY,
                       child: GestureDetector(
                         onTap: () {}, // Prevent closing when clicking on input
                         child: TextField(
@@ -149,7 +193,7 @@ class _TextInputOverlayState extends State<_TextInputOverlay> {
                           focusNode: _focusNode,
                           style: TextStyle(
                             color: Color(0xFF6DC5D9),
-                            fontSize: 28,
+                            fontSize: 28 * scaleY,
                             fontFamily: 'Consolas',
                             fontFamilyFallback: ['Courier New', 'monospace'],
                           ),
@@ -157,13 +201,16 @@ class _TextInputOverlayState extends State<_TextInputOverlay> {
                             hintText: 'Enter company code...',
                             hintStyle: TextStyle(
                               color: Color(0x806DC5D9),
-                              fontSize: 28,
+                              fontSize: 28 * scaleY,
                               fontFamily: 'Consolas',
                               fontFamilyFallback: ['Courier New', 'monospace'],
                             ),
                             filled: true,
                             fillColor: Colors.transparent,
-                            contentPadding: EdgeInsets.only(left: 20, top: 20),
+                            contentPadding: EdgeInsets.only(
+                              left: 20 * scaleX,
+                              top: 20 * scaleY,
+                            ),
                             border: InputBorder.none,
                             enabledBorder: InputBorder.none,
                             focusedBorder: InputBorder.none,
@@ -193,32 +240,207 @@ class _TextInputOverlayState extends State<_TextInputOverlay> {
       ),
     );
   }
+}
 
-  double _calculateInputBoxY(double gameHeight) {
-    // These values match loading_screen.dart calculations
-    final logoBoxHeight = 480.0; // 400 + 40*2
-    final spaceBetweenLogoAndText = 80.0;
-    final spaceBetweenTextAndInput = 70.0;
-    final inputBoxHeight = 80.0;
-    final spaceBetweenInputAndButton = 40.0;
-    final buttonHeight = 60.0;
+class _CheatMenuOverlay extends StatefulWidget {
+  final HackGame game;
 
-    final totalHeight =
-        logoBoxHeight +
-        spaceBetweenLogoAndText +
-        36.0 +
-        spaceBetweenTextAndInput +
-        inputBoxHeight +
-        spaceBetweenInputAndButton +
-        buttonHeight;
+  const _CheatMenuOverlay({required this.game});
 
-    final startY = (gameHeight - totalHeight) / 2;
-    final logoBoxY = startY;
-    final companyLoginTextY =
-        logoBoxY + logoBoxHeight + spaceBetweenLogoAndText;
-    final inputBoxYPosition =
-        companyLoginTextY + 36.0 / 2 + spaceBetweenTextAndInput;
+  @override
+  State<_CheatMenuOverlay> createState() => _CheatMenuOverlayState();
+}
 
-    return inputBoxYPosition;
+class _CheatMenuOverlayState extends State<_CheatMenuOverlay> {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        // Close overlay when tapping outside
+        widget.game.overlays.remove('cheatMenu');
+      },
+      child: Container(
+        color: Colors.black.withOpacity(0.8),
+        child: Center(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final screenWidth = constraints.maxWidth;
+              final screenHeight = constraints.maxHeight;
+              final gameAspectRatio = GameDimensions.gameAspectRatio;
+              final screenAspectRatio = screenWidth / screenHeight;
+
+              double gameWidth, gameHeight;
+              if (screenAspectRatio > gameAspectRatio) {
+                gameHeight = screenHeight;
+                gameWidth = screenHeight * gameAspectRatio;
+              } else {
+                gameWidth = screenWidth;
+                gameHeight = screenWidth / gameAspectRatio;
+              }
+
+              return SizedBox(
+                width: gameWidth,
+                height: gameHeight,
+                child: GestureDetector(
+                  onTap: () {}, // Prevent closing when clicking inside
+                  child: Container(
+                    margin: EdgeInsets.all(40),
+                    decoration: BoxDecoration(
+                      color: Color(0xFF1A1A1A),
+                      border: Border.all(
+                        color: Color(0xFF6DC5D9),
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Header
+                        Container(
+                          padding: EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Color(0xFF0F1F30),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              topRight: Radius.circular(10),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Cheat Menu',
+                                style: TextStyle(
+                                  color: Color(0xFF6DC5D9),
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Consolas',
+                                  fontFamilyFallback: ['Courier New', 'monospace'],
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  widget.game.overlays.remove('cheatMenu');
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(8),
+                                  child: Text(
+                                    'X',
+                                    style: TextStyle(
+                                      color: Color(0xFF6DC5D9),
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Consolas',
+                                      fontFamilyFallback: ['Courier New', 'monospace'],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Level buttons
+                        Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _buildLevelButton(
+                                'Splash Screen',
+                                () {
+                                  widget.game.navigateToSplash();
+                                  widget.game.overlays.remove('cheatMenu');
+                                },
+                              ),
+                              SizedBox(height: 12),
+                              _buildLevelButton(
+                                'Loading Screen',
+                                () {
+                                  widget.game.navigateToLoading();
+                                  widget.game.overlays.remove('cheatMenu');
+                                },
+                              ),
+                              SizedBox(height: 12),
+                              _buildLevelButton(
+                                'Phase Zero',
+                                () {
+                                  widget.game.navigateToPhaseZero();
+                                  widget.game.overlays.remove('cheatMenu');
+                                },
+                              ),
+                              SizedBox(height: 12),
+                              _buildLevelButton(
+                                'Phase One',
+                                () {
+                                  widget.game.navigateToPhaseOne();
+                                  widget.game.overlays.remove('cheatMenu');
+                                },
+                              ),
+                              SizedBox(height: 12),
+                              _buildLevelButton(
+                                'Power Dashboard',
+                                () {
+                                  widget.game.navigateToPowerDashboard();
+                                  widget.game.overlays.remove('cheatMenu');
+                                },
+                              ),
+                              SizedBox(height: 12),
+                              _buildLevelButton(
+                                'Level Two',
+                                () {
+                                  widget.game.navigateToLevelTwo();
+                                  widget.game.overlays.remove('cheatMenu');
+                                },
+                              ),
+                              SizedBox(height: 12),
+                              _buildLevelButton(
+                                'Level Four',
+                                () {
+                                  widget.game.navigateToSocialMediaLevel();
+                                  widget.game.overlays.remove('cheatMenu');
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLevelButton(String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+        decoration: BoxDecoration(
+          color: Color(0x990F1F30),
+          border: Border.all(
+            color: Color(0xFF6DC5D9),
+            width: 1,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Color(0xFF6DC5D9),
+            fontSize: 24,
+            fontFamily: 'Consolas',
+            fontFamilyFallback: ['Courier New', 'monospace'],
+          ),
+        ),
+      ),
+    );
   }
 }

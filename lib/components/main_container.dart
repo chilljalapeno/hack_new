@@ -5,20 +5,37 @@ import 'package:hack_improved/constants.dart';
 class MainContainer extends PositionComponent {
   PositionComponent child;
   MainContainer({required this.child})
-    : super(size: Vector2(1500, 850), position: Vector2(210, 148));
+    : super(
+        size: Vector2(
+          GameDimensions.mainContainerWidth,
+          GameDimensions.mainContainerHeight,
+        ),
+        position: Vector2(
+          GameDimensions.mainContainerMarginHorizontal,
+          GameDimensions.mainContainerMarginTop,
+        ),
+      );
 
   @override
   Future<void> onLoad() async {
     //Shape of the main container
     RoundedRectangle inner = RoundedRectangle(
-      radius: 8,
+      radius: GameDimensions.borderRadius,
       color: ThemeColors.mainContainerBg,
-      position: Vector2(3, 3),
+      position: Vector2(
+        GameDimensions.outlineWidth,
+        GameDimensions.outlineWidth,
+      ),
       size: size,
     );
     RoundedRectangle outer = RoundedRectangle(
-      radius: 8,
-      size: size + Vector2(6, 6),
+      radius: GameDimensions.borderRadius,
+      size:
+          size +
+          Vector2(
+            GameDimensions.outlineWidth * 2,
+            GameDimensions.outlineWidth * 2,
+          ),
       color: ThemeColors.mainContainerOutline,
       children: [inner],
     );

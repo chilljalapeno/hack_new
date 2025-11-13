@@ -184,7 +184,6 @@ class ServerBox extends PositionComponent
 
   @override
   Future<void> onLoad() async {
-    print(serverNumber);
     add(sprite);
   }
 

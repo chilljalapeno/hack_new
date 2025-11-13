@@ -20,10 +20,14 @@ class LoadingScreen extends World with HasGameReference<HackGame> {
     inputBox.unfocus();
   }
 
+  // Expose input box position and size for overlay alignment
+  Vector2 get inputBoxPosition => inputBox.position;
+  Vector2 get inputBoxSize => inputBox.size;
+
   @override
   Future<void> onLoad() async {
-    final screenWidth = game.size.x;
-    final screenHeight = game.size.y;
+    final screenWidth = GameDimensions.gameWidth;
+    final screenHeight = GameDimensions.gameHeight;
 
     // Add background image (same as splash screen)
     final background = SpriteComponent(
@@ -34,26 +38,27 @@ class LoadingScreen extends World with HasGameReference<HackGame> {
     add(background);
 
     // Logo dimensions
-    final logoWidth = 400.0;
-    final logoHeight = 400.0;
-    final logoBoxPadding = 40.0;
-    final logoBoxWidth = logoWidth + logoBoxPadding * 2;
-    final logoBoxHeight = logoHeight + logoBoxPadding * 2;
+    final logoWidth = GameDimensions.loadingLogoSize;
+    final logoHeight = GameDimensions.loadingLogoSize;
+    final logoBoxPadding = GameDimensions.loadingLogoBoxPadding;
+    final logoBoxWidth = GameDimensions.loadingLogoBoxSize;
+    final logoBoxHeight = GameDimensions.loadingLogoBoxSize;
 
     // Element spacing
-    final spaceBetweenLogoAndText = 80.0;
-    final spaceBetweenTextAndInput = 70.0;
-    final inputBoxWidth = 600.0;
-    final inputBoxHeight = 80.0;
-    final spaceBetweenInputAndButton = 40.0;
-    final buttonWidth = 300.0;
-    final buttonHeight = 60.0;
+    final spaceBetweenLogoAndText = GameDimensions.loadingSpacingLogoToText;
+    final spaceBetweenTextAndInput = GameDimensions.loadingSpacingTextToInput;
+    final inputBoxWidth = GameDimensions.loadingInputWidth;
+    final inputBoxHeight = GameDimensions.loadingInputHeight;
+    final spaceBetweenInputAndButton =
+        GameDimensions.loadingSpacingInputToButton;
+    final buttonWidth = GameDimensions.loadingButtonWidth;
+    final buttonHeight = GameDimensions.loadingButtonHeight;
 
     // Calculate total height of all elements
     final totalHeight =
         logoBoxHeight +
         spaceBetweenLogoAndText +
-        36.0 + // Company Login text height (approximate)
+        GameDimensions.loadingTextHeight +
         spaceBetweenTextAndInput +
         inputBoxHeight +
         spaceBetweenInputAndButton +
@@ -79,7 +84,7 @@ class LoadingScreen extends World with HasGameReference<HackGame> {
       size: Vector2(logoBoxWidth, logoBoxHeight),
       color: ThemeColors.uiHeader,
       isFilled: false,
-      strokeWidth: 3.0,
+      strokeWidth: GameDimensions.outlineWidth,
     );
 
     // Add logo image
@@ -117,7 +122,9 @@ class LoadingScreen extends World with HasGameReference<HackGame> {
 
     // Input box for company code
     final inputBoxYPosition =
-        companyLoginTextY + 36.0 / 2 + spaceBetweenTextAndInput;
+        companyLoginTextY +
+        GameDimensions.loadingTextHeight / 2 +
+        spaceBetweenTextAndInput;
 
     inputBox = _InputBoxComponent(
       position: Vector2((screenWidth - inputBoxWidth) / 2, inputBoxYPosition),
@@ -196,7 +203,7 @@ class _InputBoxComponent extends PositionComponent with TapCallbacks {
     final outlinePaint = Paint()
       ..color = Color(0xFF6DC5D9)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0;
+      ..strokeWidth = GameDimensions.outlineWidth;
     canvas.drawRect(size.toRect(), outlinePaint);
 
     // Only draw the text if the overlay is not active (to prevent text doubling)

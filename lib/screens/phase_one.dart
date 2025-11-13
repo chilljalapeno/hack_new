@@ -3,6 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
+import 'package:hack_improved/components/ui_header.dart';
 import 'package:hack_improved/hack_game.dart';
 import 'package:hack_improved/components/warning_banner.dart';
 import 'package:hack_improved/components/ios_notification.dart';
@@ -18,8 +19,8 @@ class PhaseOne extends World with HasGameReference<HackGame>, TapCallbacks {
 
   @override
   Future<void> onLoad() async {
-    final screenWidth = game.size.x;
-    final screenHeight = game.size.y;
+    final screenWidth = GameDimensions.gameWidth;
+    final screenHeight = GameDimensions.gameHeight;
 
     // Hacker background with binary code pattern
     _background = SpriteComponent(
@@ -32,21 +33,19 @@ class PhaseOne extends World with HasGameReference<HackGame>, TapCallbacks {
     add(_background);
 
     // Status bar at top with cyan color scheme (fixed time to match image)
-    add(
-      _FixedTimeStatusBar(
-        screenWidth: screenWidth,
-        y: 45,
-        timeColor: ThemeColors.uiHeader,
-        centerTime: true,
-        showWifiBattery: true,
-      ),
-    );
+    add(UiHeader());
 
     // Add flashing warning banner
     add(
       WarningBanner(
-        position: Vector2((screenWidth - 800) / 2, 90),
-        size: Vector2(900, 60),
+        position: Vector2(
+          (screenWidth - GameDimensions.phaseOneBannerWidth) / 2,
+          GameDimensions.phaseOneBannerY,
+        ),
+        size: Vector2(
+          GameDimensions.phaseOneBannerWidth,
+          GameDimensions.phaseOneBannerHeight,
+        ),
         message: 'SYSTEM BREACH - Unauthorized Access Detected',
         color: ThemeColors.warnRed,
         flash: true,
@@ -127,16 +126,17 @@ class PhaseOne extends World with HasGameReference<HackGame>, TapCallbacks {
     ];
 
     // Fixed positioning for 4x2 grid layout
-    const rightPadding = 140.0;
+    final rightPadding = GameDimensions.phaseOneRightPadding;
 
     // Fixed icon sizing for consistent 4x2 grid layout
-    const iconSize = 160.0;
-    const iconSpacing = 80.0;
+    final iconSize = GameDimensions.phaseOneIconSize;
+    final iconSpacing = GameDimensions.phaseOneIconSpacing;
 
     // Right-aligned grid
     final gridWidth = (iconSize * 4) + (iconSpacing * 3);
     final startX = screenWidth - rightPadding - gridWidth;
-    final gridHeight = (iconSize * 2) + iconSpacing + 120;
+    final gridHeight =
+        (iconSize * 2) + iconSpacing + GameDimensions.phaseOneIconLabelHeight;
     final startY = ((screenHeight - gridHeight) / 2).clamp(
       140.0,
       double.infinity,
@@ -149,7 +149,12 @@ class PhaseOne extends World with HasGameReference<HackGame>, TapCallbacks {
       final col = i % 4;
 
       final x = startX + (col * (iconSize + iconSpacing));
-      final y = startY + (row * (iconSize + iconSpacing + 60));
+      final y =
+          startY +
+          (row *
+              (iconSize +
+                  iconSpacing +
+                  GameDimensions.phaseOneIconLabelHeight));
 
       final app = apps[i];
       final icon = _HackedAppIcon(
@@ -167,14 +172,14 @@ class PhaseOne extends World with HasGameReference<HackGame>, TapCallbacks {
 
   void _addLeftErrorPanels(double screenWidth, double screenHeight) {
     // Layout matches the image with afterhack assets
-    final leftPadding = 120.0;
-    final topStart = 180.0;
+    final leftPadding = GameDimensions.phaseOneLeftPadding;
+    final topStart = GameDimensions.phaseOneTopStart;
 
-    const weatherWidth = 620.0;
-    const weatherHeight = 430.0;
-    const calendarWidth = weatherWidth;
-    const calendarHeight = 260.0;
-    const verticalGap = 36.0;
+    final weatherWidth = GameDimensions.phaseOneWeatherWidth;
+    final weatherHeight = GameDimensions.phaseOneWeatherHeight;
+    final calendarWidth = weatherWidth;
+    final calendarHeight = GameDimensions.phaseOneCalendarHeight;
+    final verticalGap = GameDimensions.phaseOneVerticalGap;
 
     // Weather error panel with afterhack asset
     final weatherPanel = SpriteComponent(
@@ -228,8 +233,8 @@ class PhaseOne extends World with HasGameReference<HackGame>, TapCallbacks {
   }
 
   Future<void> _showHackerIntro() async {
-    final screenWidth = game.size.x;
-    final screenHeight = game.size.y;
+    final screenWidth = GameDimensions.gameWidth;
+    final screenHeight = GameDimensions.gameHeight;
 
     // Semi-transparent dark overlay with cyan tint
     final overlay = RectangleComponent(
@@ -310,9 +315,9 @@ class PhaseOne extends World with HasGameReference<HackGame>, TapCallbacks {
   }
 
   void _showIOSNotification() {
-    final screenWidth = game.size.x;
-    final notificationWidth = 800.0;
-    final notificationHeight = 180.0;
+    final screenWidth = GameDimensions.gameWidth;
+    final notificationWidth = GameDimensions.phaseOneNotificationWidth;
+    final notificationHeight = GameDimensions.phaseOneNotificationHeight;
 
     // Create notification container
     final notification = IOSNotification(
@@ -327,7 +332,10 @@ class PhaseOne extends World with HasGameReference<HackGame>, TapCallbacks {
     // Animate notification sliding down
     notification.add(
       MoveEffect.to(
-        Vector2((screenWidth - notificationWidth) / 2, 160),
+        Vector2(
+          (screenWidth - notificationWidth) / 2,
+          GameDimensions.phaseOneNotificationY,
+        ),
         EffectController(duration: 0.5, curve: Curves.easeOut),
       ),
     );
@@ -371,7 +379,10 @@ class _HackedAppIcon extends PositionComponent
     required this.iconAsset,
     required this.isActive,
   }) : iconSize = size,
-       super(position: position, size: Vector2(size, size + 120));
+       super(
+         position: position,
+         size: Vector2(size, size + GameDimensions.phaseOneIconLabelHeight),
+       );
 
   @override
   Future<void> onLoad() async {
@@ -407,7 +418,10 @@ class _HackedAppIcon extends PositionComponent
           fontWeight: FontWeight.w500,
         ),
       ),
-      position: Vector2(iconSize / 2, iconSize + 20),
+      position: Vector2(
+        iconSize / 2,
+        iconSize + GameDimensions.phaseOneIconLabelSpacing,
+      ),
       anchor: Anchor.topCenter,
     );
     add(label);
@@ -499,87 +513,5 @@ class _DarkRoundedIconContainer extends PositionComponent {
         },
       ),
     );
-  }
-
-  @override
-  void render(Canvas canvas) {
-    // No border or glow since we're using notification instead
-  }
-}
-
-// Status bar with fixed time to match the image
-class _FixedTimeStatusBar extends PositionComponent
-    with HasGameReference<HackGame> {
-  final double screenWidth;
-  @override
-  final double y;
-  final Color timeColor;
-  final bool centerTime;
-  final bool showWifiBattery;
-
-  _FixedTimeStatusBar({
-    required this.screenWidth,
-    required this.y,
-    required this.timeColor,
-    this.centerTime = true,
-    this.showWifiBattery = true,
-  });
-
-  @override
-  Future<void> onLoad() async {
-    const timeString = '8:41';
-
-    final position = centerTime ? Vector2(screenWidth / 2, y) : Vector2(80, y);
-    final anchor = centerTime ? Anchor.center : Anchor.centerLeft;
-
-    final timeDisplay = TextComponent(
-      text: timeString,
-      textRenderer: TextPaint(
-        style: TextStyle(
-          color: timeColor,
-          fontSize: 40,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      position: position,
-      anchor: anchor,
-    );
-    add(timeDisplay);
-
-    if (showWifiBattery) {
-      // Add connection icon (leftmost)
-      add(
-        SpriteComponent(
-          sprite: Sprite(
-            game.images.fromCache('phase0_icons/connection_white.png'),
-          ),
-          size: Vector2(36, 28),
-          position: Vector2(screenWidth - 150, y),
-          anchor: Anchor.center,
-        ),
-      );
-
-      // Add WiFi icon (middle)
-      add(
-        SpriteComponent(
-          sprite: Sprite(game.images.fromCache('phase0_icons/wifi_white.png')),
-          size: Vector2(40, 32),
-          position: Vector2(screenWidth - 90, y),
-          anchor: Anchor.center,
-        ),
-      );
-
-      // Add battery icon (rightmost)
-      add(
-        SpriteComponent(
-          sprite: Sprite(
-            game.images.fromCache('phase0_icons/battery_white.png'),
-          ),
-          size: Vector2(40, 24),
-          position: Vector2(screenWidth - 35, y),
-          anchor: Anchor.center,
-        ),
-      );
-    }
   }
 }

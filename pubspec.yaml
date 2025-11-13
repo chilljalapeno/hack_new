@@ -60,6 +60,9 @@ flutter:
     - assets/images/Safe.png
     - assets/images/phase0_icons/png_location.png
     - assets/images/phase0_icons/png_calendar.png
+    - assets/images/employee1.png
+    - assets/images/employee2.png
+    - assets/images/employee3.png
     # - assets/images/Observation.png
     # - assets/images/Background before hack.png
     # - assets/images/Background after hack.png

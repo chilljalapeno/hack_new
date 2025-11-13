@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:hack_improved/hack_game.dart';
 import 'package:hack_improved/components/ui_header.dart';
 import 'package:hack_improved/components/ios_notification.dart';
+import 'package:hack_improved/constants.dart';
 
 class PhaseZero extends World with HasGameReference<HackGame>, TapCallbacks {
   PhaseZero();
@@ -15,8 +16,8 @@ class PhaseZero extends World with HasGameReference<HackGame>, TapCallbacks {
 
   @override
   Future<void> onLoad() async {
-    final screenWidth = game.size.x;
-    final screenHeight = game.size.y;
+    final screenWidth = GameDimensions.gameWidth;
+    final screenHeight = GameDimensions.gameHeight;
 
     // Background image
     add(
@@ -72,11 +73,11 @@ class PhaseZero extends World with HasGameReference<HackGame>, TapCallbacks {
   }
 
   void _showNotifications() {
-    final screenWidth = game.size.x;
-    final notificationWidth = 900.0;
-    final notificationHeight = 140.0;
-    final startY = 100.0;
-    final spacing = 20.0;
+    final screenWidth = GameDimensions.gameWidth;
+    final notificationWidth = GameDimensions.phaseZeroNotificationWidth;
+    final notificationHeight = GameDimensions.phaseZeroNotificationHeight;
+    final startY = GameDimensions.phaseZeroNotificationStartY;
+    final spacing = GameDimensions.phaseZeroNotificationSpacing;
 
     // Notification 1: Technical Services - System Alert
     final notification1 = IOSNotification(
@@ -184,13 +185,13 @@ class PhaseZero extends World with HasGameReference<HackGame>, TapCallbacks {
 
   void _addLeftInfoPanels(double screenWidth, double screenHeight) {
     // Sizes tuned to closely match the reference
-    final leftPadding = 120.0;
-    final topStart = 200.0;
+    final leftPadding = GameDimensions.phaseZeroLeftPadding;
+    final topStart = GameDimensions.phaseZeroTopStart;
 
     // Weather card
     // Reduced sizes to remove blur
-    const weatherWidth = 560.0;
-    const weatherHeight = 390.0;
+    final weatherWidth = GameDimensions.phaseZeroWeatherWidth;
+    final weatherHeight = GameDimensions.phaseZeroWeatherHeight;
     add(
       SpriteComponent(
         sprite: Sprite(game.images.fromCache('phase0_icons/weather.png')),
@@ -200,9 +201,9 @@ class PhaseZero extends World with HasGameReference<HackGame>, TapCallbacks {
     );
 
     // Calendar card (static)
-    const calendarWidth = weatherWidth;
-    const calendarHeight = 220.0;
-    const verticalGap = 28.0;
+    final calendarWidth = weatherWidth;
+    final calendarHeight = GameDimensions.phaseZeroCalendarHeight;
+    final verticalGap = GameDimensions.phaseZeroVerticalGap;
     add(
       SpriteComponent(
         sprite: Sprite(game.images.fromCache('phase0_icons/calendar.png')),
@@ -228,10 +229,10 @@ class PhaseZero extends World with HasGameReference<HackGame>, TapCallbacks {
     ];
 
     // Reserve space for the left weather + calendar panels
-    const leftPadding = 120.0;
-    const weatherWidth = 560.0;
-    const gapRightOfPanels = 100.0;
-    const rightPadding = 140.0;
+    final leftPadding = GameDimensions.phaseZeroLeftPadding;
+    final weatherWidth = GameDimensions.phaseZeroWeatherWidth;
+    final gapRightOfPanels = GameDimensions.phaseZeroGapRightOfPanels;
+    final rightPadding = GameDimensions.phaseZeroRightPadding;
 
     final availableRightWidth =
         screenWidth -
@@ -239,16 +240,16 @@ class PhaseZero extends World with HasGameReference<HackGame>, TapCallbacks {
         rightPadding;
 
     // Compute icon size to fit 4 columns with spacing, with reasonable clamps
-    const minIconSize = 150.0;
-    const maxIconSize = 210.0;
-    const iconSpacing = 76.0;
+    final minIconSize = GameDimensions.phaseZeroMinIconSize;
+    final maxIconSize = GameDimensions.phaseZeroMaxIconSize;
+    final iconSpacing = GameDimensions.phaseZeroIconSpacing;
     final computedIconSize = (availableRightWidth - (3 * iconSpacing)) / 4.0;
     final iconSize = computedIconSize.clamp(minIconSize, maxIconSize);
 
     // Calculate grid positioning (flush-right within the available area)
     final gridWidth = (iconSize * 4) + (iconSpacing * 3);
     final startX = screenWidth - rightPadding - gridWidth;
-    final gridHeight = (iconSize * 2) + iconSpacing + 120;
+    final gridHeight = (iconSize * 2) + iconSpacing + GameDimensions.phaseZeroIconLabelHeight;
     final startY = ((screenHeight - gridHeight) / 2).clamp(
       140.0,
       double.infinity,
@@ -259,7 +260,7 @@ class PhaseZero extends World with HasGameReference<HackGame>, TapCallbacks {
       final col = i % 4;
 
       final x = startX + (col * (iconSize + iconSpacing));
-      final y = startY + (row * (iconSize + iconSpacing + 60));
+      final y = startY + (row * (iconSize + iconSpacing + GameDimensions.phaseZeroIconLabelHeight));
 
       // Create app icon container
       _addAppIcon(
@@ -325,14 +326,14 @@ class PhaseZero extends World with HasGameReference<HackGame>, TapCallbacks {
             fontWeight: FontWeight.w500,
           ),
         ),
-        position: position + Vector2(size / 2, size + 20),
+        position: position + Vector2(size / 2, size + GameDimensions.phaseZeroIconLabelSpacing),
         anchor: Anchor.topCenter,
       ),
     );
 
     // Make icon tappable (for future interaction)
     final tapArea = RectangleComponent(
-      size: Vector2(size, size + 120),
+      size: Vector2(size, size + GameDimensions.phaseZeroIconLabelHeight),
       position: position,
       paint: Paint()..color = Colors.transparent,
     );

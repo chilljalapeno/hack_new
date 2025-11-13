@@ -17,8 +17,8 @@ class SplashScreen extends World with HasGameReference<HackGame> {
 
   @override
   Future<void> onLoad() async {
-    final screenWidth = game.size.x;
-    final screenHeight = game.size.y;
+    final screenWidth = GameDimensions.gameWidth;
+    final screenHeight = GameDimensions.gameHeight;
 
     // Add splash background image
     final background = SpriteComponent(
@@ -29,11 +29,10 @@ class SplashScreen extends World with HasGameReference<HackGame> {
     add(background);
 
     // Logo dimensions - maintain aspect ratio (logo appears to be roughly square)
-    final logoWidth = 500.0;
-    final logoHeight = 500.0;
-    final boxPadding = 50.0;
-    final boxWidth = logoWidth + boxPadding * 2;
-    final boxHeight = logoHeight + boxPadding * 2;
+    final logoWidth = GameDimensions.logoSize;
+    final logoHeight = GameDimensions.logoSize;
+    final boxWidth = GameDimensions.logoBoxSize;
+    final boxHeight = GameDimensions.logoBoxSize;
 
     // Create semi-transparent box with outline
     boxRect = FadableRectangle(
@@ -55,7 +54,7 @@ class SplashScreen extends World with HasGameReference<HackGame> {
       size: Vector2(boxWidth, boxHeight),
       color: ThemeColors.brandTeal,
       isFilled: false,
-      strokeWidth: 3.0,
+      strokeWidth: GameDimensions.outlineWidth,
     );
 
     // Add logo image with proper aspect ratio

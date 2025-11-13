@@ -10,6 +10,8 @@ import 'package:hack_improved/screens/phase_zero.dart';
 import 'package:hack_improved/screens/phase_one.dart';
 import 'package:hack_improved/screens/power_dashboard.dart';
 import 'package:hack_improved/screens/splash_screen.dart';
+import 'package:hack_improved/screens/social_media_level.dart';
+import 'package:hack_improved/constants.dart';
 
 class HackGame extends FlameGame {
   late CameraComponent cam;
@@ -19,9 +21,41 @@ class HackGame extends FlameGame {
   late PhaseOne phaseOne;
   late PowerDashboard powerDashboard;
   late LevelTwo levelTwo;
+  late SocialMediaLevel socialMediaLevel;
 
   // Store the company name entered by the player
   String companyName = 'Company Name';
+
+  // Cheat navigation methods
+  void navigateToSplash() {
+    cam.world = splashScreen;
+  }
+
+  void navigateToLoading() {
+    cam.world = loadingScreen;
+  }
+
+  void navigateToPhaseZero() {
+    cam.world = phaseZero;
+    phaseZero.startSequence();
+  }
+
+  void navigateToPhaseOne() {
+    cam.world = phaseOne;
+    phaseOne.startSequence();
+  }
+
+  void navigateToPowerDashboard() {
+    cam.world = powerDashboard;
+  }
+
+  void navigateToLevelTwo() {
+    cam.world = levelTwo;
+  }
+
+  void navigateToSocialMediaLevel() {
+    cam.world = socialMediaLevel;
+  }
 
   @override
   Future<void> onLoad() async {
@@ -42,6 +76,7 @@ class HackGame extends FlameGame {
     phaseOne = PhaseOne();
     powerDashboard = PowerDashboard();
     levelTwo = LevelTwo();
+    socialMediaLevel = SocialMediaLevel();
     loadingScreen = LoadingScreen();
 
     final levelTwoProvider = FlameBlocProvider<LevelTwoBloc, LevelTwoState>(
@@ -51,8 +86,8 @@ class HackGame extends FlameGame {
 
     cam = CameraComponent.withFixedResolution(
       world: splashScreen,
-      width: size.x,
-      height: size.y,
+      width: GameDimensions.gameWidth,
+      height: GameDimensions.gameHeight,
     );
 
     cam.viewfinder.anchor = Anchor.topLeft;
@@ -65,6 +100,7 @@ class HackGame extends FlameGame {
       phaseOne,
       powerDashboard,
       levelTwoProvider,
+      socialMediaLevel,
     ]);
   }
 }
