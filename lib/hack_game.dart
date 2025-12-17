@@ -11,6 +11,9 @@ import 'package:hack_improved/screens/phase_one.dart';
 import 'package:hack_improved/screens/power_dashboard.dart';
 import 'package:hack_improved/screens/splash_screen.dart';
 import 'package:hack_improved/screens/social_media_level.dart';
+import 'package:hack_improved/screens/level_five.dart';
+import 'package:hack_improved/screens/linkedin_profile_screen.dart';
+import 'package:hack_improved/screens/password_cracker_screen.dart';
 import 'package:hack_improved/constants.dart';
 
 class HackGame extends FlameGame {
@@ -22,6 +25,9 @@ class HackGame extends FlameGame {
   late PowerDashboard powerDashboard;
   late LevelTwo levelTwo;
   late SocialMediaLevel socialMediaLevel;
+  late LevelFive levelFive;
+  late LinkedInProfileScreen linkedInProfileScreen;
+  PasswordCrackerScreen? passwordCrackerScreen;
 
   // Store the company name entered by the player
   String companyName = 'Company Name';
@@ -57,6 +63,22 @@ class HackGame extends FlameGame {
     cam.world = socialMediaLevel;
   }
 
+  void navigateToLevelFive() {
+    cam.world = levelFive;
+    levelFive.startSequence();
+  }
+
+  void navigateToLinkedInProfile() {
+    cam.world = linkedInProfileScreen;
+  }
+
+  void navigateToPasswordCracker(Set<String> cluesFound) {
+    // Create a new password cracker screen with the clues
+    passwordCrackerScreen = PasswordCrackerScreen(cluesFound: cluesFound);
+    add(passwordCrackerScreen!);
+    cam.world = passwordCrackerScreen;
+  }
+
   @override
   Future<void> onLoad() async {
     await images.loadAllImages();
@@ -77,6 +99,8 @@ class HackGame extends FlameGame {
     powerDashboard = PowerDashboard();
     levelTwo = LevelTwo();
     socialMediaLevel = SocialMediaLevel();
+    levelFive = LevelFive();
+    linkedInProfileScreen = LinkedInProfileScreen();
     loadingScreen = LoadingScreen();
 
     final levelTwoProvider = FlameBlocProvider<LevelTwoBloc, LevelTwoState>(
@@ -101,6 +125,8 @@ class HackGame extends FlameGame {
       powerDashboard,
       levelTwoProvider,
       socialMediaLevel,
+      levelFive,
+      linkedInProfileScreen,
     ]);
   }
 }

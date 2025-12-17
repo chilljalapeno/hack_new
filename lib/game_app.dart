@@ -56,6 +56,8 @@ class _GameAppState extends State<GameApp> {
                         overlayBuilderMap: {
                           'textInput': (context, game) =>
                               _TextInputOverlay(game: _game),
+                          'passwordInput': (context, game) =>
+                              _PasswordInputOverlay(game: _game),
                           'cheatMenu': (context, game) =>
                               _CheatMenuOverlay(game: _game),
                         },
@@ -242,6 +244,151 @@ class _TextInputOverlayState extends State<_TextInputOverlay> {
   }
 }
 
+class _PasswordInputOverlay extends StatefulWidget {
+  final HackGame game;
+
+  const _PasswordInputOverlay({required this.game});
+
+  @override
+  State<_PasswordInputOverlay> createState() => _PasswordInputOverlayState();
+}
+
+class _PasswordInputOverlayState extends State<_PasswordInputOverlay> {
+  final TextEditingController _controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    // Set the initial text from the current input
+    final passwordScreen = widget.game.passwordCrackerScreen;
+    if (passwordScreen != null) {
+      _controller.text = passwordScreen.currentInputText;
+    }
+    // Auto-focus the text field when overlay appears
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        // Close overlay when tapping outside
+        final inputText = _controller.text;
+        final passwordScreen = widget.game.passwordCrackerScreen;
+        if (passwordScreen != null && inputText.isNotEmpty) {
+          passwordScreen.updateInputText(inputText);
+        }
+        // Remove overlay first, then unfocus so text rebuilds correctly
+        widget.game.overlays.remove('passwordInput');
+        passwordScreen?.unfocusInput();
+      },
+      child: Container(
+        color: Colors.transparent,
+        child: Center(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final screenWidth = constraints.maxWidth;
+              final screenHeight = constraints.maxHeight;
+              final gameAspectRatio = GameDimensions.gameAspectRatio;
+              final screenAspectRatio = screenWidth / screenHeight;
+
+              double gameWidth, gameHeight;
+              if (screenAspectRatio > gameAspectRatio) {
+                gameHeight = screenHeight;
+                gameWidth = screenHeight * gameAspectRatio;
+              } else {
+                gameWidth = screenWidth;
+                gameHeight = screenWidth / gameAspectRatio;
+              }
+
+              final passwordScreen = widget.game.passwordCrackerScreen;
+              if (passwordScreen == null) {
+                return SizedBox.shrink();
+              }
+
+              // Get the actual input box position and size
+              final inputBoxPos = passwordScreen.inputBoxPosition;
+              final inputBoxSize = passwordScreen.inputBoxSize;
+
+              // Scale from game world coordinates to actual widget size
+              final scaleX = gameWidth / GameDimensions.gameWidth;
+              final scaleY = gameHeight / GameDimensions.gameHeight;
+
+              return SizedBox(
+                width: gameWidth,
+                height: gameHeight,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      left: inputBoxPos.x * scaleX,
+                      top: inputBoxPos.y * scaleY,
+                      width: inputBoxSize.x * scaleX,
+                      height: inputBoxSize.y * scaleY,
+                      child: GestureDetector(
+                        onTap: () {}, // Prevent closing when clicking on input
+                        child: TextField(
+                          controller: _controller,
+                          focusNode: _focusNode,
+                          style: TextStyle(
+                            color: Color(0xFF6DC5D9),
+                            fontSize: 22 * scaleY,
+                            fontFamily: 'Consolas',
+                            fontFamilyFallback: ['Courier New', 'monospace'],
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Enter password attempt...',
+                            hintStyle: TextStyle(
+                              color: Color(0xFF6A8A9A),
+                              fontSize: 22 * scaleY,
+                              fontFamily: 'Consolas',
+                              fontFamilyFallback: ['Courier New', 'monospace'],
+                            ),
+                            filled: true,
+                            fillColor: Colors.transparent,
+                            contentPadding: EdgeInsets.only(
+                              left: 20 * scaleX,
+                              top: 18 * scaleY,
+                            ),
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                          ),
+                          onChanged: (value) {
+                            passwordScreen.updateInputText(value);
+                          },
+                          onSubmitted: (value) {
+                            final inputText = _controller.text;
+                            if (inputText.isNotEmpty) {
+                              passwordScreen.updateInputText(inputText);
+                            }
+                            // Remove overlay first, then unfocus so text rebuilds correctly
+                            widget.game.overlays.remove('passwordInput');
+                            passwordScreen.unfocusInput();
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _CheatMenuOverlay extends StatefulWidget {
   final HackGame game;
 
@@ -340,12 +487,13 @@ class _CheatMenuOverlayState extends State<_CheatMenuOverlay> {
                             ],
                           ),
                         ),
-                        // Level buttons
-                        Padding(
-                          padding: EdgeInsets.all(20),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
+                        // Level buttons - scrollable
+                        Flexible(
+                          child: SingleChildScrollView(
+                            padding: EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
                               _buildLevelButton(
                                 'Splash Screen',
                                 () {
@@ -401,7 +549,34 @@ class _CheatMenuOverlayState extends State<_CheatMenuOverlay> {
                                   widget.game.overlays.remove('cheatMenu');
                                 },
                               ),
+                              SizedBox(height: 12),
+                              _buildLevelButton(
+                                'Level Five',
+                                () {
+                                  widget.game.navigateToLevelFive();
+                                  widget.game.overlays.remove('cheatMenu');
+                                },
+                              ),
+                              SizedBox(height: 12),
+                              _buildLevelButton(
+                                'LinkedIn Profile',
+                                () {
+                                  widget.game.navigateToLinkedInProfile();
+                                  widget.game.overlays.remove('cheatMenu');
+                                },
+                              ),
+                              SizedBox(height: 12),
+                              _buildLevelButton(
+                                'Password Cracker',
+                                () {
+                                  // Create with all clues for testing
+                                  final allClues = {'name', 'dob', 'sailing', 'cooper', 'jazz', 'photography'};
+                                  widget.game.navigateToPasswordCracker(allClues);
+                                  widget.game.overlays.remove('cheatMenu');
+                                },
+                              ),
                             ],
+                            ),
                           ),
                         ),
                       ],

@@ -80,6 +80,11 @@ class GameDimensions {
   static const double phaseOneNotificationHeight = 180.0;
   static const double phaseOneNotificationY = 160.0;
 
+  // Level Five (Social Engineering Investigation) dimensions
+  static const double levelFiveNotificationWidth = 850.0;
+  static const double levelFiveNotificationHeight = 180.0;
+  static const double levelFiveNotificationY = 110.0;
+
   // Power Dashboard dimensions
   static const double powerDashboardTitleY = 70.0;
   static const double powerDashboardTimerY = 120.0;
