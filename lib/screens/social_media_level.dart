@@ -416,8 +416,8 @@ class SocialMediaContainer extends PositionComponent
       correctCount: correctCount,
       totalCount: 9,
       onContinue: () {
-        // Navigate back to home (Level 2 home)
-        game.navigateToLevelTwo();
+        // Navigate to Level 5 (Social Engineering Investigation)
+        game.navigateToLevelFive();
       },
     );
     resultsScreen.size = size;
