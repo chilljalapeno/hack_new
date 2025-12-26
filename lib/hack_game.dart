@@ -16,6 +16,25 @@ import 'package:hack_improved/screens/linkedin_profile_screen.dart';
 import 'package:hack_improved/screens/password_cracker_screen.dart';
 import 'package:hack_improved/constants.dart';
 
+// TODO: AAyush you have to add These two providers on top of level two
+// and six
+// TODO: Transition between levels, check if everything works here and
+// if they can transition properly
+// transition = LockWorldTransition();
+//
+// await add(
+//   FlameBlocProvider<LevelTwoBloc, LevelTwoState>(
+//     create: () => LevelTwoBloc(),
+//     children: [cam, levelTwo],
+//   ),
+// );
+// await add(
+//   FlameBlocProvider<LevelSixBloc, LevelSixState>(
+//     create: () => LevelSixBloc(),
+//     children: [cam, levelSix],
+//   ),
+// );
+
 class HackGame extends FlameGame {
   late CameraComponent cam;
   late SplashScreen splashScreen;

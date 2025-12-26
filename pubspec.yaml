@@ -80,6 +80,27 @@ flutter:
     - assets/images/phase0_icons/hacker_background.png
     - assets/images/phase0_icons/afterhack_weather.png
     - assets/images/phase0_icons/afterhack_calendar.png
+
+    - assets/images/splash_background.png
+    - assets/images/connection.png
+    - assets/images/wifi.png
+    - assets/images/battery.png
+    - assets/images/blue_server.png
+    - assets/images/green_server.png
+    - assets/images/red_server.png
+    - assets/images/alert_icon.png
+    - assets/images/check.png
+    - assets/images/folder.png
+    - assets/images/node.png
+    - assets/images/human.png
+    - assets/images/arrows.png
+    - assets/images/qrcode.png
+    - assets/images/phishingbutton.png
+    - assets/images/safebutton.png
+    - assets/images/lock_open.png
+    - assets/images/lock_half.png
+    - assets/images/lock_closed.png
+    - assets/audio/lock.mp3
     # - assets/images/mail.png
     # - assets/images/Infected.png
     # - assets/images/Connection.png

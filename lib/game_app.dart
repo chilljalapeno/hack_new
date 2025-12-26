@@ -1,5 +1,6 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:hack_improved/blocs/level_two_bloc.dart';
 import 'package:hack_improved/constants.dart';
 import 'package:hack_improved/hack_game.dart';
 
@@ -60,6 +61,133 @@ class _GameAppState extends State<GameApp> {
                               _PasswordInputOverlay(game: _game),
                           'cheatMenu': (context, game) =>
                               _CheatMenuOverlay(game: _game),
+
+                          "ServerStatus": (BuildContext context, HackGame game) {
+                            return Container(
+                              width: 1920,
+                              height: 1080,
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                              ),
+                              child: Center(
+                                child: Container(
+                                  width: 800,
+                                  height: 600,
+                                  decoration: BoxDecoration(
+                                    color: Color(0xB30D2030),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Current server status",
+                                        style: TextStyle(
+                                          fontSize: 48,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      SizedBox(height: 50),
+                                      SizedBox(
+                                        width: 700,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.check,
+                                                  size: 48,
+                                                  color: Colors.green,
+                                                ),
+                                                Text(
+                                                  "Correct servers: ",
+                                                  style: TextStyle(
+                                                    fontSize: 48,
+                                                    color: Colors.green,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Text(
+                                              "${(game.levelTwo.bloc.state as Initial).correctServers}",
+                                              style: TextStyle(
+                                                fontSize: 48,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 700,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.close,
+                                                  size: 48,
+                                                  color: Colors.red,
+                                                ),
+                                                Text(
+                                                  "Incorrect servers: ",
+                                                  style: TextStyle(
+                                                    fontSize: 48,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Text(
+                                              "${8 - (game.levelTwo.bloc.state as Initial).correctServers}",
+                                              style: TextStyle(
+                                                fontSize: 48,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(height: 50),
+                                      GestureDetector(
+                                        onTap: () {
+                                          game.overlays.remove("ServerStatus");
+                                          game.levelTwo.bloc.add(
+                                            LevelTwoEvent.check(),
+                                          );
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
+                                            color: Colors.blueGrey,
+                                          ),
+                                          height: 100,
+                                          width: 500,
+                                          child: Center(
+                                            child: Text(
+                                              "Check servers",
+                                              style: TextStyle(
+                                                fontSize: 32,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         },
                       ),
                       // Floating cheat button
@@ -89,7 +217,10 @@ class _GameAppState extends State<GameApp> {
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                   fontFamily: 'Consolas',
-                                  fontFamilyFallback: ['Courier New', 'monospace'],
+                                  fontFamilyFallback: [
+                                    'Courier New',
+                                    'monospace',
+                                  ],
                                 ),
                               ),
                             ),
@@ -434,10 +565,7 @@ class _CheatMenuOverlayState extends State<_CheatMenuOverlay> {
                     margin: EdgeInsets.all(40),
                     decoration: BoxDecoration(
                       color: Color(0xFF1A1A1A),
-                      border: Border.all(
-                        color: Color(0xFF6DC5D9),
-                        width: 2,
-                      ),
+                      border: Border.all(color: Color(0xFF6DC5D9), width: 2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
@@ -463,7 +591,10 @@ class _CheatMenuOverlayState extends State<_CheatMenuOverlay> {
                                   fontSize: 32,
                                   fontWeight: FontWeight.bold,
                                   fontFamily: 'Consolas',
-                                  fontFamilyFallback: ['Courier New', 'monospace'],
+                                  fontFamilyFallback: [
+                                    'Courier New',
+                                    'monospace',
+                                  ],
                                 ),
                               ),
                               GestureDetector(
@@ -479,7 +610,10 @@ class _CheatMenuOverlayState extends State<_CheatMenuOverlay> {
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
                                       fontFamily: 'Consolas',
-                                      fontFamilyFallback: ['Courier New', 'monospace'],
+                                      fontFamilyFallback: [
+                                        'Courier New',
+                                        'monospace',
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -494,88 +628,67 @@ class _CheatMenuOverlayState extends State<_CheatMenuOverlay> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                              _buildLevelButton(
-                                'Splash Screen',
-                                () {
+                                _buildLevelButton('Splash Screen', () {
                                   widget.game.navigateToSplash();
                                   widget.game.overlays.remove('cheatMenu');
-                                },
-                              ),
-                              SizedBox(height: 12),
-                              _buildLevelButton(
-                                'Loading Screen',
-                                () {
+                                }),
+                                SizedBox(height: 12),
+                                _buildLevelButton('Loading Screen', () {
                                   widget.game.navigateToLoading();
                                   widget.game.overlays.remove('cheatMenu');
-                                },
-                              ),
-                              SizedBox(height: 12),
-                              _buildLevelButton(
-                                'Phase Zero',
-                                () {
+                                }),
+                                SizedBox(height: 12),
+                                _buildLevelButton('Phase Zero', () {
                                   widget.game.navigateToPhaseZero();
                                   widget.game.overlays.remove('cheatMenu');
-                                },
-                              ),
-                              SizedBox(height: 12),
-                              _buildLevelButton(
-                                'Phase One',
-                                () {
+                                }),
+                                SizedBox(height: 12),
+                                _buildLevelButton('Phase One', () {
                                   widget.game.navigateToPhaseOne();
                                   widget.game.overlays.remove('cheatMenu');
-                                },
-                              ),
-                              SizedBox(height: 12),
-                              _buildLevelButton(
-                                'Power Dashboard',
-                                () {
+                                }),
+                                SizedBox(height: 12),
+                                _buildLevelButton('Power Dashboard', () {
                                   widget.game.navigateToPowerDashboard();
                                   widget.game.overlays.remove('cheatMenu');
-                                },
-                              ),
-                              SizedBox(height: 12),
-                              _buildLevelButton(
-                                'Level Two',
-                                () {
+                                }),
+                                SizedBox(height: 12),
+                                _buildLevelButton('Level Two', () {
                                   widget.game.navigateToLevelTwo();
                                   widget.game.overlays.remove('cheatMenu');
-                                },
-                              ),
-                              SizedBox(height: 12),
-                              _buildLevelButton(
-                                'Level Four',
-                                () {
+                                }),
+                                SizedBox(height: 12),
+                                _buildLevelButton('Level Four', () {
                                   widget.game.navigateToSocialMediaLevel();
                                   widget.game.overlays.remove('cheatMenu');
-                                },
-                              ),
-                              SizedBox(height: 12),
-                              _buildLevelButton(
-                                'Level Five',
-                                () {
+                                }),
+                                SizedBox(height: 12),
+                                _buildLevelButton('Level Five', () {
                                   widget.game.navigateToLevelFive();
                                   widget.game.overlays.remove('cheatMenu');
-                                },
-                              ),
-                              SizedBox(height: 12),
-                              _buildLevelButton(
-                                'LinkedIn Profile',
-                                () {
+                                }),
+                                SizedBox(height: 12),
+                                _buildLevelButton('LinkedIn Profile', () {
                                   widget.game.navigateToLinkedInProfile();
                                   widget.game.overlays.remove('cheatMenu');
-                                },
-                              ),
-                              SizedBox(height: 12),
-                              _buildLevelButton(
-                                'Password Cracker',
-                                () {
+                                }),
+                                SizedBox(height: 12),
+                                _buildLevelButton('Password Cracker', () {
                                   // Create with all clues for testing
-                                  final allClues = {'name', 'dob', 'sailing', 'cooper', 'jazz', 'photography'};
-                                  widget.game.navigateToPasswordCracker(allClues);
+                                  final allClues = {
+                                    'name',
+                                    'dob',
+                                    'sailing',
+                                    'cooper',
+                                    'jazz',
+                                    'photography',
+                                  };
+                                  widget.game.navigateToPasswordCracker(
+                                    allClues,
+                                  );
                                   widget.game.overlays.remove('cheatMenu');
-                                },
-                              ),
-                            ],
+                                }),
+                              ],
                             ),
                           ),
                         ),
@@ -599,10 +712,7 @@ class _CheatMenuOverlayState extends State<_CheatMenuOverlay> {
         padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
         decoration: BoxDecoration(
           color: Color(0x990F1F30),
-          border: Border.all(
-            color: Color(0xFF6DC5D9),
-            width: 1,
-          ),
+          border: Border.all(color: Color(0xFF6DC5D9), width: 1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
